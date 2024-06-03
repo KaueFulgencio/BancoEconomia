@@ -8,12 +8,10 @@ export default function Login() {
   const navigation: any = useNavigation();
 
   const handleLogin = () => {
-    // Implemente sua lógica de login aqui (por exemplo, autenticação com backend)
     console.log('Email:', email);
-    console.log('Password:', password); // Para fins de demonstração
+    console.log('Password:', password); 
 
-    // Supondo login bem-sucedido, navegue para a tela desejada
-    navigation.navigate('Home'); // Navegar para a tela Home
+    navigation.navigate('Home'); 
   };
 
   return (
