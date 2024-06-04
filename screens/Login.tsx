@@ -14,6 +14,10 @@ export default function Login() {
     navigation.navigate('Home'); 
   };
 
+  const handleSignUp = () => {
+    navigation.navigate('SignUp')
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -41,6 +45,13 @@ export default function Login() {
                 onPress={handleLogin}
                 />
             </View>
+
+            <View style={styles.buttonContainer}>
+                <Button 
+                title="Registre-se"
+                onPress={handleSignUp}
+                />
+            </View>
     </View>
   );
 }
@@ -54,7 +65,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color: '#FFA500', // Cor laranja
+    color: '#FFA500', 
   },
   input: {
     height: 40,
@@ -65,6 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonContainer: {
+    padding: 10,
     width: '80%',
   },
 });
