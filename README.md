@@ -1,12 +1,12 @@
-git clone https://github.com/KaueFulgencio/BancoEconomia.git
-cd BancoEconomia
+## git clone https://github.com/KaueFulgencio/BancoEconomia.git
+## cd BancoEconomia
 
-Atualize as dependencias
+## Atualize as dependencias
 -npm install
 
-instale EXPO na playstore
+## Instale EXPO na playstore
 
-instale o EXPO-CLI
+## Instale o EXPO-CLI
 -npm install -g expo-cli
 
 ## Executando o projeto
