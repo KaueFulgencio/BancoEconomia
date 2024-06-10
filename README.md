@@ -11,4 +11,4 @@
 
 ## Executando o projeto
 -expo start
-irá gerar um qrcode, basta escanear com o aplicativo da EXPO
+- irá gerar um qrcode, basta escanear com o aplicativo da EXPO
