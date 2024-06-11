@@ -3,15 +3,17 @@ import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [cpf, setCPF] = useState('');
   const [password, setPassword] = useState('');
   const navigation: any = useNavigation();
 
   const handleLogin = () => {
-    console.log('Email:', email);
+    console.log('CPF:', cpf);
     console.log('Password:', password); 
 
-    navigation.navigate('Home'); 
+    navigation.navigate('Home', {
+      params: { CPF: cpf}
+    }); 
   };
 
   const handleSignUp = () => {
@@ -24,11 +26,11 @@ export default function Login() {
 
       <TextInput
         style={styles.input}
-        placeholder="Enter Email"
-        keyboardType="email-address"
+        placeholder="Enter CPF"
+        keyboardType="numeric"
         autoCapitalize="none"
-        onChangeText={setEmail}
-        value={email}
+        onChangeText={setCPF}
+        value={cpf}
       />
 
       <TextInput
@@ -43,6 +45,7 @@ export default function Login() {
                 <Button
                 title="Login"
                 onPress={handleLogin}
+                color="#FFA500"
                 />
             </View>
 
@@ -50,6 +53,7 @@ export default function Login() {
                 <Button 
                 title="Registre-se"
                 onPress={handleSignUp}
+                color="#FFA500"
                 />
             </View>
     </View>

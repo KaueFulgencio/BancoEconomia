@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
-import { strings } from 'components/strings';
+import { strings } from '../components/strings';
 import { Picker } from '@react-native-picker/picker';
 
 export default function SignUp() {
@@ -9,34 +9,58 @@ export default function SignUp() {
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [telephone, setTelephone] = useState('');
   const [occupation, setOccupation] = useState('');
-  const [typeaccount, setTypeAccount] = useState('');
+  const [typeAccount, setTypeAccount] = useState('');
   const navigation: any = useNavigation();
 
-  const handleLogin = () => {
-    console.log('Email:', email);
-    console.log('Name', name);
-    console.log('Cpf', cpf);
-    console.log('Telefone', telephone);
-    console.log('Ocupação', occupation);
-    console.log('Tipo da conta(MEI, PJ)', typeaccount);
-    console.log('Password:', password); 
+  const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem.');
+      return;
+    }
 
-    navigation.navigate('Home'); 
+    try {
+      const response = await fetch('http://localhost:3000/accounts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome: name,
+          cpf,
+          email,
+          senha: password,
+          telefone: telephone,
+          ocupacao: occupation,
+          tipo: typeAccount,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create account');
+      }
+
+      const data = await response.json();
+      console.log('Account created successfully:', data);
+      Alert.alert('Successo', 'Conta criada com sucesso!');
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('Error creating account:', error);
+      Alert.alert('Erro', 'Falha ao criar a conta. Tente novamente.');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        {strings.signUpTitle}
-      </Text>
+      <Text style={styles.title}>{strings.signUpTitle}</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Nome completo"
         keyboardType="default"
-        autoCapitalize="none"
+        autoCapitalize="words"
         onChangeText={setName}
         value={name}
       />
@@ -45,7 +69,6 @@ export default function SignUp() {
         style={styles.input}
         placeholder="Digite seu CPF"
         keyboardType="numeric"
-        secureTextEntry={true}
         onChangeText={setCpf}
         value={cpf}
       />
@@ -59,36 +82,33 @@ export default function SignUp() {
         value={email}
       />
 
-    <TextInput
+      <TextInput
         style={styles.input}
         placeholder="Digite seu telefone"
-        keyboardType="numeric"
-        secureTextEntry={true}
+        keyboardType="phone-pad"
         onChangeText={setTelephone}
         value={telephone}
       />
 
-    <TextInput
+      <TextInput
         style={styles.input}
         placeholder="Digite sua profissão"
-        autoCapitalize="none"
+        autoCapitalize="words"
         onChangeText={setOccupation}
         value={occupation}
       />
 
-    
-    <Picker
-        selectedValue={typeaccount}
+      <Picker
+        selectedValue={typeAccount}
         onValueChange={(value) => setTypeAccount(value)}
-        style={styles.picker} 
+        style={styles.picker}
       >
         <Picker.Item label="MEI" value="MEI" />
         <Picker.Item label="PJ" value="PJ" />
-        <Picker.Item label="PJ" value="PF" />
+        <Picker.Item label="PF" value="PF" />
       </Picker>
 
-
-    <TextInput
+      <TextInput
         style={styles.input}
         placeholder="Senha"
         secureTextEntry={true}
@@ -96,61 +116,52 @@ export default function SignUp() {
         value={password}
       />
 
-    <TextInput
+      <TextInput
         style={styles.input}
         placeholder="Confirme a senha"
         secureTextEntry={true}
-        onChangeText={setPassword}
-        value={password}
+        onChangeText={setConfirmPassword}
+        value={confirmPassword}
       />
 
-
-        <View style={styles.buttonContainer}>
-            <Button 
-            title="Registre-se"
-            onPress={handleLogin}
-            color="#FFA500"
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Registre-se"
+          onPress={handleSignUp}
+          color="#FFA500"
         />
-        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  inputText: {
-    marginLeft: -220
-  },
-  buttonSignUp: {
-    backgroundColor: '#FFA500', 
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   title: {
     fontSize: 24,
-    marginBottom: 90,
-    color: '#FFA500', 
+    marginBottom: 20,
+    color: '#FFA500',
   },
   input: {
     height: 40,
-    width: '80%',
+    width: '100%',
     borderColor: '#ccc',
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
   },
-  buttonContainer: {
-    padding: 10,
-    width: '80%',
-  },
   picker: {
-    width: '80%', 
-    height: 50, 
-    borderColor: '#FFA500',
-    borderWidth: 1,
-    padding: 10,
+    width: '100%',
+    height: 50,
     marginBottom: 10,
+  },
+  buttonContainer: {
+    width: '100%',
+    marginTop: 10,
   },
 });

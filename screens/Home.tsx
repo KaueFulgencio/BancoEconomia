@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { strings } from '../components/strings';
-import { Container } from 'components/Container';
+import { Container } from '../components/Container';
+import { RootStackParamList } from '../navigation';
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+const BASE_URL = 'http://localhost:3000';
 
 export default function Home() {
   return (
@@ -11,36 +18,44 @@ export default function Home() {
   );
 }
 
-function Content() {
-  const [balance, setBalance] = useState(strings.balanceAmount);
-  
-  const consumeBalance = async () => {
-    try {
-      const response = await fetch('/accounts/665e5694dd8fe574a01170ef/saldo', {
-        method: 'GET', 
-        headers: {
-          'Content-Type': 'application/json', 
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to consume balance');
+const Content: React.FC = () => {
+  const [balance, setBalance] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/accounts/665e5694dd8fe574a01170ef/saldo`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch balance');
+        }
+
+        const data = await response.json();
+        setBalance(`R$ ${data.balance.toFixed(2)}`);
+      } catch (error) {
+        console.error('Error fetching balance:', error);
+        alert('Falha ao buscar saldo. Tente novamente.');
+      } finally {
+        setLoading(false);
       }
-  
-      const data = await response.json();
-  
-      console.log('Balance consumed successfully:', data);
-      alert(`Saldo consumido com sucesso!`);
-      setBalance(data.newBalance); 
-    } catch (error) {
-      console.error('Error consuming balance:', error);
-      alert('Falha ao consumir saldo. Tente novamente.');
-    }
-  };
-  
+    };
+
+    fetchBalance();
+  }, []);
 
   const checkBalance = () => {
-    alert(`Seu saldo atual é de ${balance}`); 
+    if (balance) {
+      alert(`Seu saldo atual é de ${balance}`);
+    } else {
+      alert('Saldo não disponível');
+    }
   };
 
   const goToTransferScreen = () => {
@@ -56,11 +71,19 @@ function Content() {
   };
 
   const goToMyAccount = () => {
-    alert('Sua conta')
-  }
+    navigation.navigate('AccountScreen');
+  };
 
   const goToPixArea = () => {
-    alert('Area Pix')
+    navigation.navigate('PixArea');
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#FFA500" />
+      </View>
+    );
   }
 
   return (
@@ -68,21 +91,38 @@ function Content() {
       <Text style={styles.title}>{strings.welcomeMessage}</Text>
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceLabel}>{strings.balanceLabel}</Text>
-        <Text style={styles.balanceAmount}>{strings.balanceAmount}</Text>
+        <Text style={styles.balanceAmount}>{balance}</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <Button title={strings.myAccount} onPress={goToMyAccount} color="#FFA500" />
-        <Button title={strings.checkBalanceButton} onPress={consumeBalance} color="#FFA500" />
-        <Button title={strings.transferButton} onPress={goToTransferScreen} color="#FFA500" />
-        <Button title={strings.paymentsButton} onPress={goToPaymentsScreen} color="#FFA500" />
-        <Button title={strings.investmentsButton} onPress={goToInvestmentsScreen} color="#FFA500" />
-        <Button title={strings.pixKeys} onPress={goToPixArea} color="#FFA500" />
+        <Pressable style={styles.button} onPress={goToMyAccount}>
+          <Text style={styles.buttonText}>{strings.myAccount}</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={checkBalance}>
+          <Text style={styles.buttonText}>{strings.checkBalanceButton}</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={goToTransferScreen}>
+          <Text style={styles.buttonText}>{strings.transferButton}</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={goToPaymentsScreen}>
+          <Text style={styles.buttonText}>{strings.paymentsButton}</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={goToInvestmentsScreen}>
+          <Text style={styles.buttonText}>{strings.investmentsButton}</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={goToPixArea}>
+          <Text style={styles.buttonText}>{strings.pixKeys}</Text>
+        </Pressable>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -112,5 +152,17 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     width: '100%',
     paddingHorizontal: 20,
+  },
+  button: {
+    backgroundColor: '#FFA500',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
