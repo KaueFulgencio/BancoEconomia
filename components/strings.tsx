@@ -15,5 +15,6 @@ export const strings = {
     pixAreaListPixKeys: 'Suas chaves PIX',
     pixArea: 'Enviar PIX',
     accountScreenTitle: 'Detalhes da conta',
+    pixAreaSendPix: 'Enviar Pix',
   };
   

@@ -1,62 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons'; 
 import { strings } from '../components/strings';
 import { Container } from '../components/Container';
+import axios from 'axios';
 import { RootStackParamList } from '../navigation';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
     <Container>
       <Content />
     </Container>
   );
-}
+};
 
 const Content: React.FC = () => {
-  const [balance, setBalance] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState<boolean>(false);
+  const [showBalance, setShowBalance] = useState<boolean>(false); 
   const navigation = useNavigation<HomeScreenNavigationProp>();
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/accounts/665e5694dd8fe574a01170ef/saldo`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch balance');
-        }
-
-        const data = await response.json();
-        setBalance(`R$ ${data.balance.toFixed(2)}`);
-      } catch (error) {
-        console.error('Error fetching balance:', error);
-        alert('Falha ao buscar saldo. Tente novamente.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBalance();
-  }, []);
-
-  const checkBalance = () => {
-    if (balance) {
-      alert(`Seu saldo atual é de ${balance}`);
-    } else {
-      alert('Saldo não disponível');
-    }
-  };
 
   const goToTransferScreen = () => {
     alert('Navegar para a tela de transferências');
@@ -78,27 +46,49 @@ const Content: React.FC = () => {
     navigation.navigate('PixArea');
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#FFA500" />
-      </View>
-    );
-  }
+  const checkBalance = async () => {
+    setBalanceLoading(true);
+    try {
+      const accountId = '665e5694dd8fe574a01170ef'; 
+      const response = await axios.get(`${BASE_URL}/accounts/${accountId}/saldo`);
+      setBalance(response.data.balance);
+      setShowBalance(true); 
+    } catch (error) {
+      console.error('Failed to fetch balance:', error);
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
+  const toggleShowBalance = () => {
+    if (showBalance) {
+      setShowBalance(false);
+    } else {
+      checkBalance();
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{strings.welcomeMessage}</Text>
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceLabel}>{strings.balanceLabel}</Text>
-        <Text style={styles.balanceAmount}>{balance}</Text>
+        <Pressable onPress={toggleShowBalance}>
+          <Ionicons name={showBalance ? 'eye-off-outline' : 'eye-outline'} size={24} color="#FFA500" />
+        </Pressable>
       </View>
+      {showBalance && (
+        <View style={styles.balanceAmountContainer}>
+          {balanceLoading ? (
+            <ActivityIndicator size="small" color="#FFA500" />
+          ) : (
+            <Text style={styles.balanceAmount}>{balance !== null ? `R$ ${balance.toFixed(2)}` : '---'}</Text>
+          )}
+        </View>
+      )}
       <View style={styles.buttonsContainer}>
         <Pressable style={styles.button} onPress={goToMyAccount}>
           <Text style={styles.buttonText}>{strings.myAccount}</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={checkBalance}>
-          <Text style={styles.buttonText}>{strings.checkBalanceButton}</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={goToTransferScreen}>
           <Text style={styles.buttonText}>{strings.transferButton}</Text>
@@ -118,11 +108,6 @@ const Content: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -143,6 +128,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: 10,
     color: '#FFA500',
+  },
+  balanceAmountContainer: {
+    alignItems: 'center',
+    marginTop: 10,
   },
   balanceAmount: {
     fontSize: 18,
@@ -166,3 +155,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default Home;

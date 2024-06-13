@@ -1,48 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
 import { Container } from '../components/Container';
+import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AccountScreen'>;
 
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-}
+const BASE_URL = 'http://localhost:3001';
 
-interface AccountData {
-  accountHolder: string;
-  balance: number;
-  accountNumber: string;
-  transactions: Transaction[];
+interface AccountDetails {
+  _id: string;
+  email: string;
+  telefone: string;
+  nome: string;
+  ocupacao: string;
+  endereco: string;
+  tipo: string;
+  saldo: number;
+  createdAt: string;
+  updatedAt: string;
 }
-
-const BASE_URL = 'http://localhost:3000'; 
 
 export default function AccountScreen() {
-  const [accountData, setAccountData] = useState<AccountData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<AccountScreenNavigationProp>();
 
-  useEffect(() => {
-    const fetchAccountData = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/account/12345`);
-        const data = await response.json();
-        setAccountData(data);
-      } catch (error) {
-        console.error('Error fetching account data:', error);
-        alert('Erro ao buscar dados da conta.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchAccountDetails = async () => {
+    try {
+      setLoading(true);
+      const accountId = '665e5694dd8fe574a01170ef'; 
+      const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/${accountId}`);
+      setAccountDetails(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch account details:', err);
+      setError("Failed to fetch account details.");
+      setLoading(false);
+    }
+  };
 
-    fetchAccountData();
+  useEffect(() => {
+    fetchAccountDetails();
   }, []);
 
   if (loading) {
@@ -56,29 +59,39 @@ export default function AccountScreen() {
   return (
     <Container>
       <View style={styles.header}>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back-outline" size={24} color="#FFA500" />
+        </Pressable>
         <Text style={styles.title}>Detalhes da Conta</Text>
       </View>
       <View style={styles.accountInfo}>
-        <Text style={styles.label}>Titular da Conta:</Text>
-        <Text style={styles.value}>{accountData?.accountHolder}</Text>
-        <Text style={styles.label}>Número da Conta:</Text>
-        <Text style={styles.value}>{accountData?.accountNumber}</Text>
+        <Text style={styles.label}>Email:</Text>
+        <Text style={styles.value}>{accountDetails?.email}</Text>
+
+        <Text style={styles.label}>Telefone:</Text>
+        <Text style={styles.value}>{accountDetails?.telefone}</Text>
+
+        <Text style={styles.label}>Nome:</Text>
+        <Text style={styles.value}>{accountDetails?.nome}</Text>
+
+        <Text style={styles.label}>Ocupação:</Text>
+        <Text style={styles.value}>{accountDetails?.ocupacao}</Text>
+
+        <Text style={styles.label}>Endereço:</Text>
+        <Text style={styles.value}>{accountDetails?.endereco}</Text>
+
+        <Text style={styles.label}>Tipo:</Text>
+        <Text style={styles.value}>{accountDetails?.tipo}</Text>
+
         <Text style={styles.label}>Saldo:</Text>
-        <Text style={styles.value}>R$ {accountData?.balance.toFixed(2)}</Text>
+        <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
+
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        <Pressable style={styles.button} onPress={fetchAccountDetails}>
+          <Text style={styles.buttonText}>Atualizar Detalhes</Text>
+        </Pressable>
       </View>
-      <Text style={styles.sectionTitle}>Transações Recentes</Text>
-      <FlatList
-        data={accountData?.transactions}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.transactionItem}>
-            <Text style={styles.transactionDescription}>{item.description}</Text>
-            <Text style={styles.transactionAmount}>R$ {item.amount.toFixed(2)}</Text>
-            <Text style={styles.transactionDate}>{item.date}</Text>
-          </View>
-        )}
-        style={styles.transactionList}
-      />
     </Container>
   );
 }
@@ -95,6 +108,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
   },
+  backButton: {
+    position: 'absolute',
+    left: 10,
+    top: 20,
+    padding: 10,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -103,6 +122,7 @@ const styles = StyleSheet.create({
   },
   accountInfo: {
     marginBottom: 20,
+    alignItems: 'center',
   },
   label: {
     fontSize: 16,
@@ -113,32 +133,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+    marginBottom: 10,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFA500',
-    marginVertical: 10,
-  },
-  transactionList: {
+  errorText: {
+    color: 'red',
     marginTop: 10,
   },
-  transactionItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+  button: {
+    backgroundColor: '#FFA500',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
   },
-  transactionDescription: {
-    fontSize: 16,
-    color: '#333',
-  },
-  transactionAmount: {
+  buttonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000',
-  },
-  transactionDate: {
-    fontSize: 14,
-    color: '#666',
   },
 });
