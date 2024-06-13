@@ -33,7 +33,7 @@ export default function AccountScreen() {
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const accountId = '665e5694dd8fe574a01170ef'; 
+      const accountId = '6660aab794fddd007ab7e331'; 
       const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/${accountId}`);
       setAccountDetails(response.data);
       setLoading(false);
@@ -48,13 +48,13 @@ export default function AccountScreen() {
     fetchAccountDetails();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#FFA500" />
-      </View>
-    );
-  }
+  const handleUpdatePress = () => {
+    navigation.navigate('UpdateAccountScreen');
+  };
+
+  const handleReload = () => {
+    fetchAccountDetails();
+  };
 
   return (
     <Container>
@@ -88,7 +88,12 @@ export default function AccountScreen() {
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
-        <Pressable style={styles.button} onPress={fetchAccountDetails}>
+        <Pressable style={styles.reloadButton} onPress={handleReload}>
+          <Ionicons name="refresh-outline" size={18} color="#black" style={{ marginRight: 10 }} />
+          <Text style={styles.buttonText}>Recarregar</Text>
+        </Pressable>
+
+        <Pressable style={styles.updateButton} onPress={handleUpdatePress}>
           <Text style={styles.buttonText}>Atualizar Detalhes</Text>
         </Pressable>
       </View>
@@ -97,11 +102,6 @@ export default function AccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -139,15 +139,23 @@ const styles = StyleSheet.create({
     color: 'red',
     marginTop: 10,
   },
-  button: {
+  reloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+    backgroundColor: '#FFA500'
+  },
+  updateButton: {
     backgroundColor: '#FFA500',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: '#black',
     fontSize: 16,
     fontWeight: 'bold',
   },

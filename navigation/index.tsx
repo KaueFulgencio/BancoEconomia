@@ -8,6 +8,7 @@ import Home from '../screens/Home';
 import SignUp from '../screens/SignUp';
 import PixArea from 'screens/PixArea';
 import AccountScreen from 'screens/AccountScreen';
+import UpdateAccountScreen from 'screens/updateAccountScreen';
 
 export type RootStackParamList = {
   Overview: undefined;
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   PixArea: undefined;
   AccountScreen: undefined;
+  UpdateAccountScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -57,6 +59,14 @@ export default function RootStack() {
         <Stack.Screen
           name="AccountScreen"
           component={AccountScreen}
+          options={({ navigation }) => ({
+            headerLeft: () => <BackButton onPress={navigation.goBack} />,
+            headerShown: false, 
+          })}
+        />
+        <Stack.Screen
+          name="UpdateAccountScreen"
+          component={UpdateAccountScreen}
           options={({ navigation }) => ({
             headerLeft: () => <BackButton onPress={navigation.goBack} />,
             headerShown: false, 
