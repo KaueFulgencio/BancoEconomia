@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation';
 import { Container } from '../components/Container';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { strings } from 'components/strings';
 
 type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AccountScreen'>;
 
@@ -70,7 +71,7 @@ export default function AccountScreen() {
         <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-outline" size={24} color="#FFA500" />
         </Pressable>
-        <Text style={styles.title}>Detalhes da Conta</Text>
+        <Text style={styles.title}>{strings.accountDetails}</Text>
       </View>
       {loading ? (
         <View style={styles.loaderContainer}>
@@ -80,34 +81,33 @@ export default function AccountScreen() {
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <View style={styles.accountInfo}>
-          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.label}>{strings.accountDetailsEmail}</Text>
           <Text style={styles.value}>{accountDetails?.email}</Text>
 
-          <Text style={styles.label}>Telefone:</Text>
+          <Text style={styles.label}>{strings.accountDetailsTelefone}</Text>
           <Text style={styles.value}>{accountDetails?.telefone}</Text>
 
-          <Text style={styles.label}>Nome:</Text>
+          <Text style={styles.label}>{strings.accountDetailsNome}</Text>
           <Text style={styles.value}>{accountDetails?.nome}</Text>
 
-          <Text style={styles.label}>Ocupação:</Text>
+          <Text style={styles.label}>{strings.accountDetailsOcupacao}</Text>
           <Text style={styles.value}>{accountDetails?.ocupacao}</Text>
 
-          <Text style={styles.label}>Endereço:</Text>
+          <Text style={styles.label}>{strings.accountDetailsEndereco}</Text>
           <Text style={styles.value}>{accountDetails?.endereco}</Text>
 
-          <Text style={styles.label}>Tipo:</Text>
+          <Text style={styles.label}>{strings.accountDetailsTipo}</Text>
           <Text style={styles.value}>{accountDetails?.tipo}</Text>
 
-          <Text style={styles.label}>Saldo:</Text>
           <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
 
           <Pressable style={styles.reloadButton} onPress={handleReload}>
             <Ionicons name="refresh-outline" size={18} color="#FFFFFF" style={{ marginRight: 10 }} />
-            <Text style={styles.buttonText}>Recarregar</Text>
+            <Text style={styles.buttonText}>{strings.reload}</Text>
           </Pressable>
 
           <Pressable style={styles.updateButton} onPress={handleUpdatePress}>
-            <Text style={styles.buttonText}>Atualizar Detalhes</Text>
+            <Text style={styles.buttonText}>{strings.accountDetailsReload}</Text>
           </Pressable>
         </View>
       )}

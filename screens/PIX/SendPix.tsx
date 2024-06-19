@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '../../components/Container';
+import { strings } from 'components/strings';
 
 type SendPixScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SendPixScreen'>;
 
@@ -12,8 +13,10 @@ type Props = {
   navigation: SendPixScreenNavigationProp;
 };
 
+const BASE_URL = 'http://localhost:3001';
+
 const SendPixScreen: React.FC<Props> = ({ navigation }) => {
-  const [fromAccount, setFromAccount] = useState<string>(''); // Conta de origem (poderia ser obtida do usuário logado)
+  const [fromAccount, setFromAccount] = useState<string>(''); 
   const [toAccount, setToAccount] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
 
@@ -25,8 +28,8 @@ const SendPixScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       const requestBody = { fromAccount, toAccount, amount: parseFloat(amount) };
 
-      const response = await axios.post('http://localhost:3001/pix/send', requestBody);
-
+      const response = await axios.post(`${BASE_URL}/pix/send`, requestBody);
+      
       setLoading(false);
       Alert.alert('Sucesso', 'PIX enviado com sucesso!');
       navigation.goBack();
@@ -52,7 +55,7 @@ const SendPixScreen: React.FC<Props> = ({ navigation }) => {
         </Pressable>
       </View>
       <View style={styles.container}>
-        <Text style={styles.title}>Enviar PIX</Text>
+        <Text style={styles.title}>{strings.pixAreaSendPixTitle}</Text>
         <View style={styles.form}>
           <TextInput
             style={styles.input}
@@ -74,7 +77,7 @@ const SendPixScreen: React.FC<Props> = ({ navigation }) => {
             keyboardType="numeric"
           />
           <Pressable style={styles.button} onPress={handleSendPix}>
-            <Text style={styles.buttonText}>Enviar PIX</Text>
+            <Text style={styles.buttonText}>{strings.pixAreaSendPixTitle}</Text>
           </Pressable>
         </View>
         {loading && (

@@ -67,8 +67,8 @@ const PixArea: React.FC<Props> = ({ navigation, route }) => {
 
   const renderPixKeyItem = ({ item }: { item: PixKey }) => (
     <View style={styles.pixKeyItem}>
-      <Text style={styles.pixKeyText}>Tipo: {item.type}</Text>
-      <Text style={styles.pixKeyText}>Chave: {item.key}</Text>
+      <Text style={styles.pixKeyText}>{strings.pixAreaType} {item.type}</Text>
+      <Text style={styles.pixKeyText}>{strings.pixAreaKey} {item.key}</Text>
       <Pressable
         onPress={() => deletePixKey(item._id)}
         style={({ pressed }) => [

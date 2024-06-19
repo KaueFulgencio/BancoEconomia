@@ -5,8 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from 'navigation';
+import { strings } from 'components/strings';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+const BASE_URL = 'http://localhost:3001';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -15,7 +18,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/auth/login', {
+      const response = await axios.post(`${BASE_URL}/auth/login`, {
         email,
         password,
       });
@@ -24,7 +27,7 @@ export default function Login() {
 
       await AsyncStorage.setItem('token', access_token);
 
-      Alert.alert('Login Successful', `Token: ${access_token}`);
+      //Alert.alert('Login Successful', `Token: ${access_token}`);
       
       navigation.navigate('Home', { email });
     } catch (error) {
@@ -39,7 +42,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>{strings.loginTitle}</Text>
 
       <TextInput
         style={styles.input}

@@ -53,14 +53,13 @@ const Home: React.FC<HomeProps> = ({ route }) => {
   const checkBalance = async () => {
     setBalanceLoading(true);
     try {
-      const accountId = '665e5694dd8fe574a01170ef';
-      const response = await axios.get(`${BASE_URL}/accounts/${accountId}/saldo`);
-      setBalance(response.data.balance);
-      setShowBalance(true);
+        const response = await axios.get(`${BASE_URL}/accounts/${email}/saldo`);
+        setBalance(response.data.balance);
+        setShowBalance(true);
     } catch (error) {
-      console.error('Failed to fetch balance:', error);
+        console.error('Failed to fetch balance:', error);
     } finally {
-      setBalanceLoading(false);
+        setBalanceLoading(false);
     }
   };
 

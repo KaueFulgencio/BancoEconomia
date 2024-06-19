@@ -15,8 +15,10 @@ type Props = {
   route: CreatePixKeyScreenRouteProp;
 };
 
+const BASE_URL = 'http://localhost:3001';
+
 const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { email } = route.params; // Recebendo o email da tela anterior
+  const { email } = route.params; 
 
   const [key, setKey] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,7 +41,7 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
         requestBody = { key: generatedKey, type, email };
       }
 
-      const response = await axios.post(`http://localhost:3001/pix/${email}`, requestBody); 
+      const response = await axios.post(`${BASE_URL}/pix/${email}`, requestBody); 
       setLoading(false);
       Alert.alert('Sucesso', 'Chave PIX cadastrada com sucesso!');
       navigation.goBack();

@@ -4,6 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { strings } from '../components/strings';
 import { Picker } from '@react-native-picker/picker';
 
+const BASE_URL = 'http://localhost:3001';
+
 export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,7 +25,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/accounts', {
+      const response = await fetch(`${BASE_URL}/accounts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { strings } from 'components/strings';
 
 type UpdateAccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'UpdateAccountScreen'>;
 
@@ -52,7 +53,7 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
       setLoading(false);
     } catch (err) {
       console.error('Failed to fetch account details:', err);
-      setError('Failed to fetch account details.');
+      setError(strings.accountDetailsError);  
       setLoading(false);
     }
   };
@@ -77,10 +78,9 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
     } catch (err) {
       console.error('Failed to update account details:', err);
       setUpdating(false);
-      Alert.alert('Erro', 'Falha ao atualizar os detalhes da conta. Por favor, tente novamente.');
+      Alert.alert(strings.error, strings.accountUpdateFailed); 
     }
   };
-  
 
   const handleChange = (key: keyof UpdateAccountDetails, value: string) => {
     setAccountDetails(prevState => ({
@@ -103,18 +103,18 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
         <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-outline" size={24} color="#FFA500" />
         </Pressable>
-        <Text style={styles.title}>Atualizar Detalhes</Text>
+        <Text style={styles.title}>{strings.accountDetailsReload}</Text>
       </View>
       <View style={styles.accountInfo}>
-        <Text style={styles.label}>Email:</Text>
+        <Text style={styles.label}>{strings.accountDetailsEmail}</Text>
         <TextInput
           style={styles.input}
           value={accountDetails.email}
           onChangeText={text => handleChange('email', text)}
-          editable={!updating} 
+          editable={!updating}
         />
 
-        <Text style={styles.label}>Telefone:</Text>
+        <Text style={styles.label}>{strings.accountDetailsTelefone}</Text>
         <TextInput
           style={styles.input}
           value={accountDetails.telefone}
@@ -122,7 +122,7 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
           editable={!updating}
         />
 
-        <Text style={styles.label}>Nome:</Text>
+        <Text style={styles.label}>{strings.accountDetailsNome}</Text>
         <TextInput
           style={styles.input}
           value={accountDetails.nome}
@@ -130,7 +130,7 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
           editable={!updating}
         />
 
-        <Text style={styles.label}>Ocupação:</Text>
+        <Text style={styles.label}>{strings.accountDetailsOcupacao}</Text>
         <TextInput
           style={styles.input}
           value={accountDetails.ocupacao}
@@ -138,7 +138,7 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
           editable={!updating}
         />
 
-        <Text style={styles.label}>Endereço:</Text>
+        <Text style={styles.label}>{strings.accountDetailsEndereco}</Text>
         <TextInput
           style={styles.input}
           value={accountDetails.endereco}
@@ -146,7 +146,7 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
           editable={!updating}
         />
 
-        <Text style={styles.label}>URL da Foto:</Text>
+        <Text style={styles.label}>{strings.accountDetailsUrlFoto}</Text>
         <TextInput
           style={styles.input}
           value={accountDetails.urlFotoAccount}
@@ -160,7 +160,7 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
           {updating ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.buttonText}>Atualizar Detalhes</Text>
+            <Text style={styles.buttonText}>{strings.accountDetailsReload}</Text>
           )}
         </Pressable>
       </View>
