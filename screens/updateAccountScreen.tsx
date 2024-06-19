@@ -6,7 +6,7 @@ import { RootStackParamList } from '../navigation';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
-type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AccountScreen'>;
+type UpdateAccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'UpdateAccountScreen'>;
 
 const BASE_URL = 'http://localhost:3001';
 
@@ -20,7 +20,12 @@ interface UpdateAccountDetails {
   urlFotoAccount: string;
 }
 
-export default function UpdateAccountScreen() {
+interface UpdateAccountScreenProps {
+  email: string;
+}
+
+export default function UpdateAccountScreen({ route }: { route: { params: UpdateAccountScreenProps } }) {
+  const { email } = route.params;
   const [accountDetails, setAccountDetails] = useState<UpdateAccountDetails>({
     _id: '',
     email: '',
@@ -33,7 +38,7 @@ export default function UpdateAccountScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<boolean>(false);
-  const navigation = useNavigation<AccountScreenNavigationProp>();
+  const navigation = useNavigation<UpdateAccountScreenNavigationProp>();
 
   useEffect(() => {
     fetchAccountDetails();
@@ -42,8 +47,7 @@ export default function UpdateAccountScreen() {
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const accountId = '6660aab794fddd007ab7e331'; 
-      const response = await axios.get<UpdateAccountDetails>(`${BASE_URL}/accounts/${accountId}`);
+      const response = await axios.get<UpdateAccountDetails>(`${BASE_URL}/accounts/email/${email}`);
       setAccountDetails(response.data);
       setLoading(false);
     } catch (err) {
@@ -56,9 +60,8 @@ export default function UpdateAccountScreen() {
   const handleUpdateAccount = async () => {
     try {
       setUpdating(true);
-      const accountId = '6660aab794fddd007ab7e331'; 
       const response = await axios.patch<UpdateAccountDetails>(
-        `${BASE_URL}/accounts/${accountId}`,
+        `${BASE_URL}/accounts/${email}`,
         {
           email: accountDetails.email,
           telefone: accountDetails.telefone,
@@ -108,7 +111,7 @@ export default function UpdateAccountScreen() {
           style={styles.input}
           value={accountDetails.email}
           onChangeText={text => handleChange('email', text)}
-          editable={!updating} // Permitindo a edição do email apenas quando não estiver atualizando
+          editable={!updating} 
         />
 
         <Text style={styles.label}>Telefone:</Text>

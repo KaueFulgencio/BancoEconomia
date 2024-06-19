@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
 import { Container } from '../components/Container';
@@ -24,16 +24,22 @@ interface AccountDetails {
   updatedAt: string;
 }
 
+interface AccountScreenRouteProps {
+  email: string;
+}
+
 export default function AccountScreen() {
   const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<AccountScreenNavigationProp>();
+  const route = useRoute();
+
+  const { email } = route.params as AccountScreenRouteProps;
 
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const email = 'abcd@gmail.com';
       const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/email/${email}`);
       setAccountDetails(response.data);
       setLoading(false);
