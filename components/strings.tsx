@@ -12,7 +12,7 @@ export const strings = {
     signUpTitle: 'Registre-se',
     pixAreaTitle: 'Sua Area PIX',
     pixAreaCreate: 'Cadastrar chave PIX',
-    pixAreaListPixKeys: 'Suas chaves PIX',
+    pixAreaListPixKeys: 'Atualizar suas chaves PIX',
     pixArea: 'Enviar PIX',
     accountScreenTitle: 'Detalhes da conta',
     pixAreaSendPix: 'Enviar Pix',

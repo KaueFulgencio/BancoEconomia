@@ -71,21 +71,24 @@ const Content: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{strings.welcomeMessage}</Text>
+      
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceLabel}>{strings.balanceLabel}</Text>
         <Pressable onPress={toggleShowBalance}>
-          <Ionicons name={showBalance ? 'eye-off-outline' : 'eye-outline'} size={24} color="#FFA500" />
-        </Pressable>
-      </View>
-      {showBalance && (
-        <View style={styles.balanceAmountContainer}>
           {balanceLoading ? (
             <ActivityIndicator size="small" color="#FFA500" />
           ) : (
-            <Text style={styles.balanceAmount}>{balance !== null ? `R$ ${balance.toFixed(2)}` : '---'}</Text>
+            <Ionicons name={showBalance ? 'eye-off-outline' : 'eye-outline'} size={24} color="#FFA500" />
           )}
+        </Pressable>
+      </View>
+      
+      {showBalance && (
+        <View style={styles.balanceAmountContainer}>
+          <Text style={styles.balanceAmount}>{balance !== null ? `R$ ${balance.toFixed(2)}` : '---'}</Text>
         </View>
       )}
+
       <View style={styles.buttonsContainer}>
         <Pressable style={styles.button} onPress={goToMyAccount}>
           <Text style={styles.buttonText}>{strings.myAccount}</Text>
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 70,
+    marginBottom: 30,
     color: '#FFA500',
   },
   balanceContainer: {

@@ -9,17 +9,22 @@ import SignUp from '../screens/SignUp';
 import PixArea from 'screens/PixArea';
 import AccountScreen from 'screens/AccountScreen';
 import UpdateAccountScreen from 'screens/updateAccountScreen';
+import CreatePixKeyScreen from 'screens/PIX/CreatePixScreen';
+import SendPixScreen from 'screens/PIX/SendPix';
 
 export type RootStackParamList = {
   Overview: undefined;
   Details: { name: string };
   Login: undefined;
-  Home: undefined;
+  Home: { email: string };
   SignUp: undefined;
   PixArea: undefined;
   AccountScreen: undefined;
   UpdateAccountScreen: undefined;
+  CreatePixKeyScreen: undefined;
+  SendPixScreen: undefined;
 };
+
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -67,6 +72,22 @@ export default function RootStack() {
         <Stack.Screen
           name="UpdateAccountScreen"
           component={UpdateAccountScreen}
+          options={({ navigation }) => ({
+            headerLeft: () => <BackButton onPress={navigation.goBack} />,
+            headerShown: false, 
+          })}
+        />
+        <Stack.Screen
+          name="CreatePixKeyScreen"
+          component={CreatePixKeyScreen}
+          options={({ navigation }) => ({
+            headerLeft: () => <BackButton onPress={navigation.goBack} />,
+            headerShown: false, 
+          })}
+        />
+        <Stack.Screen
+          name="SendPixScreen"
+          component={SendPixScreen}
           options={({ navigation }) => ({
             headerLeft: () => <BackButton onPress={navigation.goBack} />,
             headerShown: false, 

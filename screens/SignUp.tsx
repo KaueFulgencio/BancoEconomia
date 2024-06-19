@@ -6,13 +6,14 @@ import { Picker } from '@react-native-picker/picker';
 
 export default function SignUp() {
   const [name, setName] = useState('');
-  const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [telephone, setTelephone] = useState('');
   const [occupation, setOccupation] = useState('');
+  const [address, setAddress] = useState('');
   const [typeAccount, setTypeAccount] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
   const navigation: any = useNavigation();
 
   const handleSignUp = async () => {
@@ -28,13 +29,14 @@ export default function SignUp() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          nome: name,
-          cpf,
           email,
-          senha: password,
           telefone: telephone,
+          nome: name,
           ocupacao: occupation,
+          endereco: address,
           tipo: typeAccount,
+          urlFotoAccount: photoUrl,
+          password,
         }),
       });
 
@@ -67,14 +69,6 @@ export default function SignUp() {
 
       <TextInput
         style={styles.input}
-        placeholder="Digite seu CPF"
-        keyboardType="numeric"
-        onChangeText={setCpf}
-        value={cpf}
-      />
-
-      <TextInput
-        style={styles.input}
         placeholder="Digite seu Email"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -98,6 +92,14 @@ export default function SignUp() {
         value={occupation}
       />
 
+      <TextInput
+        style={styles.input}
+        placeholder="Digite seu endereço"
+        autoCapitalize="words"
+        onChangeText={setAddress}
+        value={address}
+      />
+
       <Picker
         selectedValue={typeAccount}
         onValueChange={(value) => setTypeAccount(value)}
@@ -107,6 +109,14 @@ export default function SignUp() {
         <Picker.Item label="PJ" value="PJ" />
         <Picker.Item label="PF" value="PF" />
       </Picker>
+
+      <TextInput
+        style={styles.input}
+        placeholder="URL da foto do perfil"
+        autoCapitalize="none"
+        onChangeText={setPhotoUrl}
+        value={photoUrl}
+      />
 
       <TextInput
         style={styles.input}

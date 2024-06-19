@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
@@ -33,7 +33,7 @@ export default function AccountScreen() {
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const accountId = '6660aab794fddd007ab7e331'; 
+      const accountId = '6660aab794fddd007ab7e331';
       const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/${accountId}`);
       setAccountDetails(response.data);
       setLoading(false);
@@ -64,39 +64,45 @@ export default function AccountScreen() {
         </Pressable>
         <Text style={styles.title}>Detalhes da Conta</Text>
       </View>
-      <View style={styles.accountInfo}>
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{accountDetails?.email}</Text>
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#FFA500" />
+        </View>
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
+        <View style={styles.accountInfo}>
+          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.value}>{accountDetails?.email}</Text>
 
-        <Text style={styles.label}>Telefone:</Text>
-        <Text style={styles.value}>{accountDetails?.telefone}</Text>
+          <Text style={styles.label}>Telefone:</Text>
+          <Text style={styles.value}>{accountDetails?.telefone}</Text>
 
-        <Text style={styles.label}>Nome:</Text>
-        <Text style={styles.value}>{accountDetails?.nome}</Text>
+          <Text style={styles.label}>Nome:</Text>
+          <Text style={styles.value}>{accountDetails?.nome}</Text>
 
-        <Text style={styles.label}>Ocupação:</Text>
-        <Text style={styles.value}>{accountDetails?.ocupacao}</Text>
+          <Text style={styles.label}>Ocupação:</Text>
+          <Text style={styles.value}>{accountDetails?.ocupacao}</Text>
 
-        <Text style={styles.label}>Endereço:</Text>
-        <Text style={styles.value}>{accountDetails?.endereco}</Text>
+          <Text style={styles.label}>Endereço:</Text>
+          <Text style={styles.value}>{accountDetails?.endereco}</Text>
 
-        <Text style={styles.label}>Tipo:</Text>
-        <Text style={styles.value}>{accountDetails?.tipo}</Text>
+          <Text style={styles.label}>Tipo:</Text>
+          <Text style={styles.value}>{accountDetails?.tipo}</Text>
 
-        <Text style={styles.label}>Saldo:</Text>
-        <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
+          <Text style={styles.label}>Saldo:</Text>
+          <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
+          <Pressable style={styles.reloadButton} onPress={handleReload}>
+            <Ionicons name="refresh-outline" size={18} color="#FFFFFF" style={{ marginRight: 10 }} />
+            <Text style={styles.buttonText}>Recarregar</Text>
+          </Pressable>
 
-        <Pressable style={styles.reloadButton} onPress={handleReload}>
-          <Ionicons name="refresh-outline" size={18} color="#black" style={{ marginRight: 10 }} />
-          <Text style={styles.buttonText}>Recarregar</Text>
-        </Pressable>
-
-        <Pressable style={styles.updateButton} onPress={handleUpdatePress}>
-          <Text style={styles.buttonText}>Atualizar Detalhes</Text>
-        </Pressable>
-      </View>
+          <Pressable style={styles.updateButton} onPress={handleUpdatePress}>
+            <Text style={styles.buttonText}>Atualizar Detalhes</Text>
+          </Pressable>
+        </View>
+      )}
     </Container>
   );
 }
@@ -120,6 +126,11 @@ const styles = StyleSheet.create({
     color: '#FFA500',
     marginLeft: 10,
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   accountInfo: {
     marginBottom: 20,
     alignItems: 'center',
@@ -142,20 +153,22 @@ const styles = StyleSheet.create({
   reloadButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     borderRadius: 5,
     marginBottom: 10,
-    backgroundColor: '#FFA500'
+    backgroundColor: '#FFA500',
   },
   updateButton: {
     backgroundColor: '#FFA500',
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 10,
   },
   buttonText: {
-    color: '#black',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },

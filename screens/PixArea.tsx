@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { strings } from '../components/strings';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -26,7 +26,7 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
   const fetchPixKeys = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3001/accounts/665e5694dd8fe574a01170ef/pix`);
+      const response = await axios.get(`http://localhost:3001/pix/6660aab794fddd007ab7e331`);
       setPixKeys(response.data);
       setLoading(false);
     } catch (err) {
@@ -40,7 +40,7 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   const createPixKey = () => {
-    alert('Navegar para cadastrar chave PIX');
+    navigation.navigate('CreatePixKeyScreen');
   };
 
   const listPixKeys = () => {
@@ -48,8 +48,33 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
   };
 
   const sendPix = () => {
-    alert('Navegar para enviar PIX');
+    navigation.navigate('SendPixScreen')
   };
+
+  const deletePixKey = async (pixId: string) => {
+    try {
+      await axios.delete(`http://localhost:3001/pix/6660aab794fddd007ab7e331/${pixId}`);
+      fetchPixKeys(); 
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível excluir a chave PIX.');
+    }
+  };
+
+  const renderPixKeyItem = ({ item }: { item: PixKey }) => (
+    <View style={styles.pixKeyItem}>
+      <Text style={styles.pixKeyText}>Tipo: {item.type}</Text>
+      <Text style={styles.pixKeyText}>Chave: {item.key}</Text>
+      <Pressable
+        onPress={() => deletePixKey(item._id)}
+        style={({ pressed }) => [
+          styles.deleteButton,
+          { backgroundColor: pressed ? 'darkred' : 'red' },
+        ]}
+      >
+        <Icon name="trash" size={20} color="#FFFFFF" />
+      </Pressable>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -80,12 +105,7 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
         <FlatList
           data={pixKeys}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.pixKeyItem}>
-              <Text style={styles.pixKeyText}>Tipo: {item.type}</Text>
-              <Text style={styles.pixKeyText}>Chave: {item.key}</Text>
-            </View>
-          )}
+          renderItem={renderPixKeyItem}
           style={styles.pixKeyList}
         />
       )}
@@ -97,12 +117,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 20,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
@@ -111,16 +131,17 @@ const styles = StyleSheet.create({
     color: '#FFA500',
   },
   buttonsContainer: {
-    alignItems: 'center',
-    marginTop: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 20,
   },
   button: {
     backgroundColor: '#FFA500',
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 10,
-    width: '80%',
+    width: '30%',
   },
   buttonText: {
     color: '#FFFFFF',
@@ -141,13 +162,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   pixKeyItem: {
-    padding: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   pixKeyText: {
     fontSize: 16,
     color: '#333',
+  },
+  deleteButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
