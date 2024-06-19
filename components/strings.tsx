@@ -30,6 +30,7 @@ export const strings = {
     accountDetailsError: 'Erro ao atualizar conta',
     accountUpdateFailed: 'Atualização falhou',
     accountDetailsUrlFoto: 'URL da foto',
+    accountDetailsDelete: 'Deletar conta',
     pixAreaType: 'Tipo:',
     pixAreaKey: 'Chave:',
     pixAreaSendPixTitle: 'Enviar pix',

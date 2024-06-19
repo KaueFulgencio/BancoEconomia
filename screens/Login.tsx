@@ -17,6 +17,11 @@ export default function Login() {
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'Por favor, digite o email e a senha.', [{ text: 'OK', onPress: () => {} }]);
+      return;
+    }
+
     try {
       const response = await axios.post(`${BASE_URL}/auth/login`, {
         email,
@@ -27,12 +32,10 @@ export default function Login() {
 
       await AsyncStorage.setItem('token', access_token);
 
-      //Alert.alert('Login Successful', `Token: ${access_token}`);
-      
       navigation.navigate('Home', { email });
     } catch (error) {
-      console.error('Error during login:', error);
-      Alert.alert('Login Failed', 'Invalid Email or Password');
+      console.error('Erro durante o login:', error);
+      Alert.alert('Login Falhou', 'Email ou senha inválidos');
     }
   };
 
@@ -46,7 +49,7 @@ export default function Login() {
 
       <TextInput
         style={styles.input}
-        placeholder="Enter Email"
+        placeholder="Digite o Email"
         keyboardType="email-address"
         autoCapitalize="none"
         onChangeText={setEmail}
@@ -55,7 +58,7 @@ export default function Login() {
 
       <TextInput
         style={styles.input}
-        placeholder="Enter Password"
+        placeholder="Digite a Senha"
         secureTextEntry={true}
         onChangeText={setPassword}
         value={password}
@@ -71,7 +74,7 @@ export default function Login() {
 
       <View style={styles.buttonContainer}>
         <Button 
-          title="Sign Up"
+          title="Cadastrar-se"
           onPress={handleSignUp}
           color="#FFA500"
         />

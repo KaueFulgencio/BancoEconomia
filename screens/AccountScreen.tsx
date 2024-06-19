@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
-import { Container } from '../components/Container';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { Container } from '../components/Container';
 import { strings } from 'components/strings';
 
 type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AccountScreen'>;
@@ -33,6 +33,7 @@ export default function AccountScreen() {
   const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const navigation = useNavigation<AccountScreenNavigationProp>();
   const route = useRoute();
 
@@ -63,6 +64,22 @@ export default function AccountScreen() {
 
   const handleReload = () => {
     fetchAccountDetails();
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/auth/delete-account/${email}`);
+      setShowDeleteModal(false);
+      navigation.navigate('Login'); 
+    } catch (error) {
+      console.error('Erro ao deletar conta:', error);
+      setShowDeleteModal(false);
+      setError('Falha ao deletar conta. Por favor, tente novamente.');
+    }
   };
 
   return (
@@ -101,14 +118,45 @@ export default function AccountScreen() {
 
           <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
 
-          <Pressable style={styles.reloadButton} onPress={handleReload}>
+          <TouchableOpacity style={styles.reloadButton} onPress={handleReload}>
             <Ionicons name="refresh-outline" size={18} color="#FFFFFF" style={{ marginRight: 10 }} />
             <Text style={styles.buttonText}>{strings.reload}</Text>
-          </Pressable>
+          </TouchableOpacity>
 
-          <Pressable style={styles.updateButton} onPress={handleUpdatePress}>
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePress}>
             <Text style={styles.buttonText}>{strings.accountDetailsReload}</Text>
-          </Pressable>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
+            <Text style={styles.buttonText}>Deletar Conta</Text>
+          </TouchableOpacity>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showDeleteModal}
+            onRequestClose={() => setShowDeleteModal(false)}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>Tem certeza que deseja deletar a conta?</Text>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, { backgroundColor: 'red' }]}
+                    onPress={() => setShowDeleteModal(false)}
+                  >
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, { backgroundColor: '#FFA500' }]}
+                    onPress={confirmDeleteAccount}
+                  >
+                    <Text style={styles.buttonText}>Deletar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )}
     </Container>
@@ -175,9 +223,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  deleteButton: {
+    backgroundColor: 'red',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  // Estilos para o modal de confirmação
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 5,
+    minWidth: 300,
+  },
+  modalText: {
+    marginBottom: 20,
+    textAlign: 'center',
+    fontSize: 18,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 5,
   },
 });

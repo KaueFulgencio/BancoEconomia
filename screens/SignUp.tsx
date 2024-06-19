@@ -49,7 +49,7 @@ export default function SignUp() {
       const data = await response.json();
       console.log('Account created successfully:', data);
       Alert.alert('Successo', 'Conta criada com sucesso!');
-      navigation.navigate('Home');
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Error creating account:', error);
       Alert.alert('Erro', 'Falha ao criar a conta. Tente novamente.');
