@@ -70,14 +70,14 @@ export default function UpdateAccountScreen() {
       );
       setAccountDetails(response.data);
       setUpdating(false);
-      navigation.navigate('AccountScreen') 
- 
+      navigation.navigate('AccountScreen', { email: response.data.email });
     } catch (err) {
       console.error('Failed to update account details:', err);
       setUpdating(false);
       Alert.alert('Erro', 'Falha ao atualizar os detalhes da conta. Por favor, tente novamente.');
     }
   };
+  
 
   const handleChange = (key: keyof UpdateAccountDetails, value: string) => {
     setAccountDetails(prevState => ({
@@ -108,7 +108,7 @@ export default function UpdateAccountScreen() {
           style={styles.input}
           value={accountDetails.email}
           onChangeText={text => handleChange('email', text)}
-          editable={!updating}
+          editable={!updating} // Permitindo a edição do email apenas quando não estiver atualizando
         />
 
         <Text style={styles.label}>Telefone:</Text>

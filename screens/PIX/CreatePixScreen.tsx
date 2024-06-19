@@ -16,6 +16,8 @@ type Props = {
 };
 
 const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { email } = route.params; // Recebendo o email da tela anterior
+
   const [key, setKey] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [type, setType] = useState<'CPF' | 'TELEFONE' | 'EMAIL' | 'CHAVE_ALEATORIA'>('CPF');
@@ -29,15 +31,15 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
 
       setLoading(true);
 
-      let requestBody = { key, type };
+      let requestBody = { key, type, email }; 
 
       if (type === 'CHAVE_ALEATORIA') {
         const generatedKey = generateRandomKey();
         setKey(generatedKey);
-        requestBody = { key: generatedKey, type };
+        requestBody = { key: generatedKey, type, email };
       }
 
-      const response = await axios.post('http://localhost:3001/pix/6660aab794fddd007ab7e331', requestBody);
+      const response = await axios.post(`http://localhost:3001/pix/${email}`, requestBody); 
       setLoading(false);
       Alert.alert('Sucesso', 'Chave PIX cadastrada com sucesso!');
       navigation.goBack();
@@ -108,13 +110,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#fff', 
+    backgroundColor: '#fff',
   },
   header: {
     position: 'absolute',
     top: 40,
     left: 20,
-    zIndex: 1, 
+    zIndex: 1,
   },
   title: {
     fontSize: 24,

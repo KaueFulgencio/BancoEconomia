@@ -3,13 +3,16 @@ import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator, Alert }
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { strings } from '../components/strings';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation';
+import { RouteProp } from '@react-navigation/native';
 import axios from 'axios';
+import { RootStackParamList } from '../navigation';
 
 type PixAreaNavigationProp = StackNavigationProp<RootStackParamList, 'PixArea'>;
+type PixAreaRouteProp = RouteProp<RootStackParamList, 'PixArea'>;
 
 type Props = {
   navigation: PixAreaNavigationProp;
+  route: PixAreaRouteProp;
 };
 
 interface PixKey {
@@ -18,7 +21,7 @@ interface PixKey {
   key: string;
 }
 
-const PixArea: React.FC<Props> = ({ navigation }) => {
+const PixArea: React.FC<Props> = ({ navigation, route }) => {
   const [pixKeys, setPixKeys] = useState<PixKey[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +29,8 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
   const fetchPixKeys = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3001/pix/6660aab794fddd007ab7e331`);
+      const email = route.params?.email || '';
+      const response = await axios.get(`http://localhost:3001/pix/${email}`);
       setPixKeys(response.data);
       setLoading(false);
     } catch (err) {
@@ -40,7 +44,7 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   const createPixKey = () => {
-    navigation.navigate('CreatePixKeyScreen');
+    navigation.navigate('CreatePixKeyScreen', { email: route.params?.email });
   };
 
   const listPixKeys = () => {
@@ -48,13 +52,14 @@ const PixArea: React.FC<Props> = ({ navigation }) => {
   };
 
   const sendPix = () => {
-    navigation.navigate('SendPixScreen')
+    navigation.navigate('SendPixScreen');
   };
 
   const deletePixKey = async (pixId: string) => {
     try {
-      await axios.delete(`http://localhost:3001/pix/6660aab794fddd007ab7e331/${pixId}`);
-      fetchPixKeys(); 
+      const email = route.params?.email || '';
+      await axios.delete(`http://localhost:3001/pix/${email}/${pixId}`);
+      fetchPixKeys();
     } catch (err) {
       Alert.alert('Erro', 'Não foi possível excluir a chave PIX.');
     }

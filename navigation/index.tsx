@@ -18,10 +18,10 @@ export type RootStackParamList = {
   Login: undefined;
   Home: { email: string };
   SignUp: undefined;
-  PixArea: undefined;
-  AccountScreen: undefined;
-  UpdateAccountScreen: undefined;
-  CreatePixKeyScreen: undefined;
+  PixArea: { email: string};
+  AccountScreen: { email: string};
+  UpdateAccountScreen: { email: string };
+  CreatePixKeyScreen: {email: string};
   SendPixScreen: undefined;
 };
 

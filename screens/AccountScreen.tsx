@@ -33,8 +33,8 @@ export default function AccountScreen() {
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const accountId = '6660aab794fddd007ab7e331';
-      const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/${accountId}`);
+      const email = 'abcd@gmail.com';
+      const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/email/${email}`);
       setAccountDetails(response.data);
       setLoading(false);
     } catch (err) {
@@ -49,7 +49,9 @@ export default function AccountScreen() {
   }, []);
 
   const handleUpdatePress = () => {
-    navigation.navigate('UpdateAccountScreen');
+    if (accountDetails) {
+      navigation.navigate('UpdateAccountScreen', { email: accountDetails.email });
+    }
   };
 
   const handleReload = () => {
