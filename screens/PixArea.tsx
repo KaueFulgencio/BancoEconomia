@@ -52,7 +52,7 @@ const PixArea: React.FC<Props> = ({ navigation, route }) => {
   };
 
   const sendPix = () => {
-    navigation.navigate('SendPixScreen');
+    navigation.navigate('SendPixScreen', { email: route.params?.email });
   };
 
   const deletePixKey = async (pixId: string) => {

@@ -22,7 +22,7 @@ export type RootStackParamList = {
   AccountScreen: { email: string};
   UpdateAccountScreen: { email: string };
   CreatePixKeyScreen: {email: string};
-  SendPixScreen: undefined;
+  SendPixScreen: {email: string};
 };
 
 

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import { strings } from '../components/strings';
 import { Picker } from '@react-native-picker/picker';
 
 const BASE_URL = 'http://localhost:3001';
 
-export default function SignUp() {
+const SignUp: React.FC = () => {
+  const navigation: any = useNavigation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,15 +17,36 @@ export default function SignUp() {
   const [address, setAddress] = useState('');
   const [typeAccount, setTypeAccount] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
-  const navigation: any = useNavigation();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
+    setError(null);
+
+    if (!name || !email || !password || !confirmPassword || !telephone || !occupation || !address || !typeAccount) {
+      setError('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      setError('Por favor, digite um email válido.');
+      return;
+    }
+
+    const phoneRegex = /^[0-9]{10,11}$/; 
+    if (!phoneRegex.test(telephone)) {
+      setError('Por favor, digite um número de telefone válido.');
+      return;
+    }
+
     if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem.');
+      setError('As senhas não coincidem.');
       return;
     }
 
     try {
+      setLoading(true);
       const response = await fetch(`${BASE_URL}/accounts`, {
         method: 'POST',
         headers: {
@@ -42,23 +64,27 @@ export default function SignUp() {
         }),
       });
 
+      setLoading(false);
+
       if (!response.ok) {
         throw new Error('Failed to create account');
       }
 
       const data = await response.json();
       console.log('Account created successfully:', data);
-      Alert.alert('Successo', 'Conta criada com sucesso!');
       navigation.navigate('Login');
     } catch (error) {
+      setLoading(false);
       console.error('Error creating account:', error);
-      Alert.alert('Erro', 'Falha ao criar a conta. Tente novamente.');
+      setError('Falha ao criar a conta. Tente novamente.');
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{strings.signUpTitle}</Text>
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <TextInput
         style={styles.input}
@@ -138,14 +164,15 @@ export default function SignUp() {
 
       <View style={styles.buttonContainer}>
         <Button
-          title="Registre-se"
+          title={loading ? 'Registrando...' : 'Registre-se'}
           onPress={handleSignUp}
           color="#FFA500"
+          disabled={loading}
         />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -176,4 +203,10 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 10,
   },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
 });
+
+export default SignUp;

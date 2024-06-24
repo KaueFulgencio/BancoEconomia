@@ -53,13 +53,13 @@ const Home: React.FC<HomeProps> = ({ route }) => {
   const checkBalance = async () => {
     setBalanceLoading(true);
     try {
-        const response = await axios.get(`${BASE_URL}/accounts/${email}/saldo`);
-        setBalance(response.data.balance);
-        setShowBalance(true);
+      const response = await axios.get(`${BASE_URL}/accounts/${email}/saldo`);
+      setBalance(response.data.balance);
+      setShowBalance(true);
     } catch (error) {
-        console.error('Failed to fetch balance:', error);
+      console.error('Failed to fetch balance:', error);
     } finally {
-        setBalanceLoading(false);
+      setBalanceLoading(false);
     }
   };
 
@@ -95,18 +95,23 @@ const Home: React.FC<HomeProps> = ({ route }) => {
 
         <View style={styles.buttonsContainer}>
           <Pressable style={styles.button} onPress={goToMyAccount}>
+            <Ionicons name="person-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.myAccount}</Text>
           </Pressable>
           <Pressable style={styles.button} onPress={goToTransferScreen}>
+            <Ionicons name="arrow-forward-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.transferButton}</Text>
           </Pressable>
           <Pressable style={styles.button} onPress={goToPaymentsScreen}>
+            <Ionicons name="wallet-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.paymentsButton}</Text>
           </Pressable>
           <Pressable style={styles.button} onPress={goToInvestmentsScreen}>
+            <Ionicons name="trending-up-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.investmentsButton}</Text>
           </Pressable>
           <Pressable style={styles.button} onPress={goToPixArea}>
+            <Ionicons name="scan-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.pixKeys}</Text>
           </Pressable>
         </View>
@@ -147,20 +152,27 @@ const styles = StyleSheet.create({
     color: '#FFA500',
   },
   buttonsContainer: {
-    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
+    marginTop: 20,
   },
   button: {
     backgroundColor: '#FFA500',
-    padding: 15,
-    borderRadius: 5,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 5,
     marginBottom: 10,
+    width: '45%', 
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
 

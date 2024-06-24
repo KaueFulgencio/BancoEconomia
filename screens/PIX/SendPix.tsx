@@ -1,34 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '../../components/Container';
 import { strings } from 'components/strings';
 
 type SendPixScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SendPixScreen'>;
+type SendPixScreenRouteProp = RouteProp<RootStackParamList, 'SendPixScreen'>;
 
 type Props = {
   navigation: SendPixScreenNavigationProp;
+  route: SendPixScreenRouteProp;
 };
 
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = 'http://localhost:3001';  
 
-const SendPixScreen: React.FC<Props> = ({ navigation }) => {
-  const [fromAccount, setFromAccount] = useState<string>(''); 
-  const [toAccount, setToAccount] = useState<string>('');
+const SendPixScreen: React.FC<Props> = ({ navigation, route }) => {
+  const [toEmail, setToEmail] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const fromEmail = route.params?.email || '';
+
+  useEffect(() => {
+    if (!fromEmail) {
+      Alert.alert('Erro', 'Email de origem não fornecido');
+      navigation.goBack();
+    }
+  }, [fromEmail]);
+
   const handleSendPix = async () => {
     try {
       setLoading(true);
-      const requestBody = { fromAccount, toAccount, amount: parseFloat(amount) };
+      const requestBody = { fromEmail, toEmail, amount: parseFloat(amount) };
 
-      const response = await axios.post(`${BASE_URL}/pix/send`, requestBody);
+      const response = await axios.post(`${BASE_URL}/accounts/send-pix`, requestBody);
       
       setLoading(false);
       Alert.alert('Sucesso', 'PIX enviado com sucesso!');
@@ -37,7 +48,7 @@ const SendPixScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(false);
       if (axios.isAxiosError(error)) {
         const axiosError = error as any;
-        const { message, statusCode } = axiosError.response?.data || {};
+        const { message } = axiosError.response?.data || {};
         setError(message || error.message || 'Erro ao enviar o PIX.');
       } else {
         setError('Erro ao enviar o PIX.');
@@ -48,9 +59,7 @@ const SendPixScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <Container>
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={() => {
-          navigation.goBack();
-        }}>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-outline" size={24} color="#FFA500" />
         </Pressable>
       </View>
@@ -59,15 +68,9 @@ const SendPixScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.form}>
           <TextInput
             style={styles.input}
-            placeholder="Conta de origem"
-            value={fromAccount}
-            onChangeText={setFromAccount}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Conta de destino"
-            value={toAccount}
-            onChangeText={setToAccount}
+            placeholder="Email de destino"
+            value={toEmail}
+            onChangeText={setToEmail}
           />
           <TextInput
             style={styles.input}
