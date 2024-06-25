@@ -11,6 +11,7 @@ import AccountScreen from 'screens/AccountScreen';
 import UpdateAccountScreen from 'screens/updateAccountScreen';
 import CreatePixKeyScreen from 'screens/PIX/CreatePixScreen';
 import SendPixScreen from 'screens/PIX/SendPix';
+import BankStatementsScreen from 'screens/BankStatementsScreen';
 
 export type RootStackParamList = {
   Overview: undefined;
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   UpdateAccountScreen: { email: string };
   CreatePixKeyScreen: {email: string};
   SendPixScreen: {email: string};
+  BankStatementsScreen: {email: string};
 };
 
 
@@ -88,6 +90,14 @@ export default function RootStack() {
         <Stack.Screen
           name="SendPixScreen"
           component={SendPixScreen}
+          options={({ navigation }) => ({
+            headerLeft: () => <BackButton onPress={navigation.goBack} />,
+            headerShown: false, 
+          })}
+        />
+        <Stack.Screen
+          name="BankStatementsScreen"
+          component={BankStatementsScreen}
           options={({ navigation }) => ({
             headerLeft: () => <BackButton onPress={navigation.goBack} />,
             headerShown: false, 

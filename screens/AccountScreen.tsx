@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Modal, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
@@ -23,6 +23,7 @@ interface AccountDetails {
   saldo: number;
   createdAt: string;
   updatedAt: string;
+  urlFotoAccount: string; 
 }
 
 interface AccountScreenRouteProps {
@@ -72,9 +73,9 @@ export default function AccountScreen() {
 
   const confirmDeleteAccount = async () => {
     try {
-      const response = await axios.delete(`${BASE_URL}/auth/delete-account/${email}`);
+      await axios.delete(`${BASE_URL}/auth/delete-account/${email}`);
       setShowDeleteModal(false);
-      navigation.navigate('Login'); 
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Erro ao deletar conta:', error);
       setShowDeleteModal(false);
@@ -84,103 +85,118 @@ export default function AccountScreen() {
 
   return (
     <Container>
-      <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back-outline" size={24} color="#FFA500" />
-        </Pressable>
-        <Text style={styles.title}>{strings.accountDetails}</Text>
-      </View>
-      {loading ? (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#FFA500" />
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.header}>
+          <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back-outline" size={24} color="#FFA500" />
+          </Pressable>
+          <Text style={styles.title}>{strings.accountDetails}</Text>
         </View>
-      ) : error ? (
-        <Text style={styles.errorText}>{error}</Text>
-      ) : (
-        <View style={styles.accountInfo}>
-          <Text style={styles.label}>{strings.accountDetailsEmail}</Text>
-          <Text style={styles.value}>{accountDetails?.email}</Text>
+        {loading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#FFA500" />
+          </View>
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : (
+          <View style={styles.accountInfo}>
+            <View style={styles.profileContainer}>
+              <Image
+                source={{ uri: accountDetails?.urlFotoAccount }}
+                style={styles.profileImage}
+                resizeMode="cover"
+              />
+              <View style={styles.profileDetails}>
+                <Text style={styles.label}>{strings.accountDetailsEmail}</Text>
+                <Text style={styles.value}>{accountDetails?.email}</Text>
 
-          <Text style={styles.label}>{strings.accountDetailsTelefone}</Text>
-          <Text style={styles.value}>{accountDetails?.telefone}</Text>
+                <Text style={styles.label}>{strings.accountDetailsTelefone}</Text>
+                <Text style={styles.value}>{accountDetails?.telefone}</Text>
 
-          <Text style={styles.label}>{strings.accountDetailsNome}</Text>
-          <Text style={styles.value}>{accountDetails?.nome}</Text>
+                <Text style={styles.label}>{strings.accountDetailsNome}</Text>
+                <Text style={styles.value}>{accountDetails?.nome}</Text>
 
-          <Text style={styles.label}>{strings.accountDetailsOcupacao}</Text>
-          <Text style={styles.value}>{accountDetails?.ocupacao}</Text>
+                <Text style={styles.label}>{strings.accountDetailsOcupacao}</Text>
+                <Text style={styles.value}>{accountDetails?.ocupacao}</Text>
 
-          <Text style={styles.label}>{strings.accountDetailsEndereco}</Text>
-          <Text style={styles.value}>{accountDetails?.endereco}</Text>
+                <Text style={styles.label}>{strings.accountDetailsEndereco}</Text>
+                <Text style={styles.value}>{accountDetails?.endereco}</Text>
 
-          <Text style={styles.label}>{strings.accountDetailsTipo}</Text>
-          <Text style={styles.value}>{accountDetails?.tipo}</Text>
+                <Text style={styles.label}>{strings.accountDetailsTipo}</Text>
+                <Text style={styles.value}>{accountDetails?.tipo}</Text>
 
-          <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
-
-          <TouchableOpacity style={styles.reloadButton} onPress={handleReload}>
-            <Ionicons name="refresh-outline" size={18} color="#FFFFFF" style={{ marginRight: 10 }} />
-            <Text style={styles.buttonText}>{strings.reload}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePress}>
-            <Text style={styles.buttonText}>{strings.accountDetailsReload}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
-            <Text style={styles.buttonText}>Deletar Conta</Text>
-          </TouchableOpacity>
-
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showDeleteModal}
-            onRequestClose={() => setShowDeleteModal(false)}
-          >
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <Text style={styles.modalText}>Tem certeza que deseja deletar a conta?</Text>
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    style={[styles.modalButton, { backgroundColor: 'red' }]}
-                    onPress={() => setShowDeleteModal(false)}
-                  >
-                    <Text style={styles.buttonText}>Cancelar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.modalButton, { backgroundColor: '#FFA500' }]}
-                    onPress={confirmDeleteAccount}
-                  >
-                    <Text style={styles.buttonText}>Deletar</Text>
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.value}>R$ {accountDetails?.saldo.toFixed(2)}</Text>
               </View>
             </View>
-          </Modal>
-        </View>
-      )}
+
+            <TouchableOpacity style={styles.reloadButton} onPress={handleReload}>
+              <Ionicons name="refresh-outline" size={18} color="#FFFFFF" style={{ marginRight: 10 }} />
+              <Text style={styles.buttonText}>{strings.reload}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePress}>
+              <Text style={styles.buttonText}>{strings.accountDetailsReload}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
+              <Text style={styles.buttonText}>Deletar Conta</Text>
+            </TouchableOpacity>
+
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={showDeleteModal}
+              onRequestClose={() => setShowDeleteModal(false)}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Text style={styles.modalText}>Tem certeza que deseja deletar a conta?</Text>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: 'red' }]}
+                      onPress={() => setShowDeleteModal(false)}
+                    >
+                      <Text style={styles.buttonText}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: '#FFA500' }]}
+                      onPress={confirmDeleteAccount}
+                    >
+                      <Text style={styles.buttonText}>Deletar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )}
+      </ScrollView>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    backgroundColor: '#fff',
   },
   backButton: {
-    position: 'absolute',
-    left: 10,
-    top: 20,
-    padding: 10,
+    marginRight: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFA500',
-    marginLeft: 10,
+    textAlign: 'center',
   },
   loaderContainer: {
     flex: 1,
@@ -190,6 +206,20 @@ const styles = StyleSheet.create({
   accountInfo: {
     marginBottom: 20,
     alignItems: 'center',
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginRight: 20,
+  },
+  profileDetails: {
+    flex: 1,
   },
   label: {
     fontSize: 16,
@@ -236,7 +266,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  // Estilos para o modal de confirmação
   centeredView: {
     flex: 1,
     justifyContent: 'center',

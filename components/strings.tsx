@@ -7,7 +7,7 @@ export const strings = {
     checkBalanceButton: 'Ver Saldo',
     transferButton: 'Transferências',
     extratoButton: 'Extrato',
-    paymentsButton: 'Pagamentos',
+    paymentsButton: 'Extrato',
     investmentsButton: 'Investimentos',
     signUpTitle: 'Registre-se',
     pixAreaTitle: 'Sua Area PIX',

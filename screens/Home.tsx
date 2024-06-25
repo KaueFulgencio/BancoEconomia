@@ -34,8 +34,8 @@ const Home: React.FC<HomeProps> = ({ route }) => {
     alert('Navigate to Transfer Screen');
   };
 
-  const goToPaymentsScreen = () => {
-    alert('Navigate to Payments Screen');
+  const goToBankStatementsScreen = () => {
+    navigation.navigate('BankStatementsScreen', {email})
   };
 
   const goToInvestmentsScreen = () => {
@@ -98,17 +98,9 @@ const Home: React.FC<HomeProps> = ({ route }) => {
             <Ionicons name="person-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.myAccount}</Text>
           </Pressable>
-          <Pressable style={styles.button} onPress={goToTransferScreen}>
-            <Ionicons name="arrow-forward-outline" size={24} color="#FFFFFF" />
-            <Text style={styles.buttonText}>{strings.transferButton}</Text>
-          </Pressable>
-          <Pressable style={styles.button} onPress={goToPaymentsScreen}>
+          <Pressable style={styles.button} onPress={goToBankStatementsScreen}>
             <Ionicons name="wallet-outline" size={24} color="#FFFFFF" />
             <Text style={styles.buttonText}>{strings.paymentsButton}</Text>
-          </Pressable>
-          <Pressable style={styles.button} onPress={goToInvestmentsScreen}>
-            <Ionicons name="trending-up-outline" size={24} color="#FFFFFF" />
-            <Text style={styles.buttonText}>{strings.investmentsButton}</Text>
           </Pressable>
           <Pressable style={styles.button} onPress={goToPixArea}>
             <Ionicons name="scan-outline" size={24} color="#FFFFFF" />

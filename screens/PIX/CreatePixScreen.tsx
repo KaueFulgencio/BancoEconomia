@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, Alert, ActivityIndicator } from 'react-native';
-import axios from 'axios';
+import { View, Text, StyleSheet, TextInput, Pressable, ActivityIndicator } from 'react-native';
+import axios, { AxiosError } from 'axios'; // Importe AxiosError do axios
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation';
@@ -23,11 +23,12 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
   const [key, setKey] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [type, setType] = useState<'CPF' | 'TELEFONE' | 'EMAIL' | 'CHAVE_ALEATORIA'>('CPF');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleCreatePixKey = async () => {
     try {
       if (type !== 'CHAVE_ALEATORIA' && !key) {
-        Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+        setErrorMessage('Por favor, preencha todos os campos.');
         return;
       }
 
@@ -43,12 +44,23 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
 
       const response = await axios.post(`${BASE_URL}/pix/${email}`, requestBody); 
       setLoading(false);
-      Alert.alert('Sucesso', 'Chave PIX cadastrada com sucesso!');
+      setErrorMessage('');
       navigation.goBack();
     } catch (error) {
       setLoading(false);
       console.error('Erro ao cadastrar a chave PIX:', error);
-      Alert.alert('Erro', 'Não foi possível cadastrar a chave PIX.');
+
+      // Verifique se 'error' é do tipo AxiosError
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<any>;
+        if (axiosError.response && axiosError.response.data && axiosError.response.data.message) {
+          setErrorMessage(axiosError.response.data.message);
+        } else {
+          setErrorMessage('Não foi possível cadastrar a chave PIX.');
+        }
+      } else {
+        setErrorMessage('Não foi possível cadastrar a chave PIX.');
+      }
     }
   };
 
@@ -96,6 +108,8 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
         <Pressable style={styles.button} onPress={handleCreatePixKey}>
           <Text style={styles.buttonText}>Cadastrar Chave PIX</Text>
         </Pressable>
+
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       </View>
       {loading ? (
         <View style={styles.loader}>
@@ -119,12 +133,6 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     zIndex: 1,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    color: '#FFA500',
   },
   form: {
     marginBottom: 20,
@@ -161,6 +169,10 @@ const styles = StyleSheet.create({
   loaderText: {
     color: '#FFFFFF',
     fontSize: 18,
+    marginTop: 10,
+  },
+  errorText: {
+    color: 'red',
     marginTop: 10,
   },
 });
