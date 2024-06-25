@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import axios from 'axios';
 import { RootStackParamList } from '../navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type PixAreaNavigationProp = StackNavigationProp<RootStackParamList, 'PixArea'>;
 type PixAreaRouteProp = RouteProp<RootStackParamList, 'PixArea'>;
@@ -29,8 +30,22 @@ const PixArea: React.FC<Props> = ({ navigation, route }) => {
   const fetchPixKeys = async () => {
     try {
       setLoading(true);
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        setLoading(false);
+        return;
+      }
+  
       const email = route.params?.email || '';
-      const response = await axios.get(`http://localhost:3001/pix/${email}`);
+      const response = await axios.get(`http://localhost:3001/pix/${email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
       setPixKeys(response.data);
       setLoading(false);
     } catch (err) {
@@ -38,6 +53,7 @@ const PixArea: React.FC<Props> = ({ navigation, route }) => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchPixKeys();
@@ -57,13 +73,26 @@ const PixArea: React.FC<Props> = ({ navigation, route }) => {
 
   const deletePixKey = async (pixId: string) => {
     try {
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        return;
+      }
+  
       const email = route.params?.email || '';
-      await axios.delete(`http://localhost:3001/pix/${email}/${pixId}`);
-      fetchPixKeys();
+      await axios.delete(`http://localhost:3001/pix/${email}/${pixId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      await fetchPixKeys();
     } catch (err) {
       Alert.alert('Erro', 'Não foi possível excluir a chave PIX.');
     }
   };
+  
 
   const renderPixKeyItem = ({ item }: { item: PixKey }) => (
     <View style={styles.pixKeyItem}>

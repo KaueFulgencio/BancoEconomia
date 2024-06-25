@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ActivityIndicator } from 'react-native';
-import axios, { AxiosError } from 'axios'; // Importe AxiosError do axios
+import axios, { AxiosError } from 'axios'; 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type CreatePixKeyScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CreatePixKeyScreen'>;
 type CreatePixKeyScreenRouteProp = RouteProp<RootStackParamList, 'CreatePixKeyScreen'>;
@@ -31,26 +32,38 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
         setErrorMessage('Por favor, preencha todos os campos.');
         return;
       }
-
+  
       setLoading(true);
-
-      let requestBody = { key, type, email }; 
-
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        setLoading(false);
+        return;
+      }
+  
+      let requestBody = { key, type, email };
+  
       if (type === 'CHAVE_ALEATORIA') {
         const generatedKey = generateRandomKey();
         setKey(generatedKey);
         requestBody = { key: generatedKey, type, email };
       }
-
-      const response = await axios.post(`${BASE_URL}/pix/${email}`, requestBody); 
+  
+      const response = await axios.post(`${BASE_URL}/pix/${email}`, requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
       setLoading(false);
       setErrorMessage('');
       navigation.goBack();
     } catch (error) {
       setLoading(false);
       console.error('Erro ao cadastrar a chave PIX:', error);
-
-      // Verifique se 'error' é do tipo AxiosError
+  
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<any>;
         if (axiosError.response && axiosError.response.data && axiosError.response.data.message) {
@@ -63,6 +76,7 @@ const CreatePixKeyScreen: React.FC<Props> = ({ navigation, route }) => {
       }
     }
   };
+  
 
   const generateRandomKey = (): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

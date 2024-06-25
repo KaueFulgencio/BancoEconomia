@@ -4,6 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Container } from '../components/Container';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = 'http://localhost:3001';
 
@@ -12,7 +13,7 @@ interface Transaction {
   type: 'entrada' | 'saída';
   amount: number;
   description?: string;
-  date: string;  // Note that the field is named 'date' as per your response body
+  date: string;  
 }
 
 export default function BankStatementsScreen() {
@@ -27,7 +28,20 @@ export default function BankStatementsScreen() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<Transaction[]>(`${BASE_URL}/transaction/${email}/transactions`);
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        return;
+      }
+  
+      const response = await axios.get<Transaction[]>(`${BASE_URL}/transaction/${email}/transactions`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
       setTransactions(response.data);
       setLoading(false);
     } catch (err) {
@@ -36,6 +50,7 @@ export default function BankStatementsScreen() {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchTransactions();

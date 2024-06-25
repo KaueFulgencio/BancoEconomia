@@ -7,6 +7,8 @@ import { strings } from '../components/strings';
 import { Container } from '../components/Container';
 import axios from 'axios';
 import { RootStackParamList } from '../navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
@@ -30,16 +32,8 @@ const Home: React.FC<HomeProps> = ({ route }) => {
     }
   }, [route.params]);
 
-  const goToTransferScreen = () => {
-    alert('Navigate to Transfer Screen');
-  };
-
   const goToBankStatementsScreen = () => {
     navigation.navigate('BankStatementsScreen', {email})
-  };
-
-  const goToInvestmentsScreen = () => {
-    alert('Navigate to Investments Screen');
   };
 
   const goToMyAccount = () => {
@@ -53,7 +47,19 @@ const Home: React.FC<HomeProps> = ({ route }) => {
   const checkBalance = async () => {
     setBalanceLoading(true);
     try {
-      const response = await axios.get(`${BASE_URL}/accounts/${email}/saldo`);
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        return;
+      }
+  
+      const response = await axios.get(`${BASE_URL}/accounts/${email}/saldo`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
       setBalance(response.data.balance);
       setShowBalance(true);
     } catch (error) {
@@ -68,6 +74,15 @@ const Home: React.FC<HomeProps> = ({ route }) => {
       setShowBalance(false);
     } else {
       checkBalance();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.navigate('Login'); 
+    } catch (error) {
+      console.error('Erro ao realizar logout:', error);
     }
   };
 
@@ -107,7 +122,12 @@ const Home: React.FC<HomeProps> = ({ route }) => {
             <Text style={styles.buttonText}>{strings.pixKeys}</Text>
           </Pressable>
         </View>
+
+        <Pressable onPress={handleLogout} style={styles.logoutButton}>
+            <Ionicons name="log-out-outline" size={24} color="red" />
+        </Pressable>
       </View>
+
     </Container>
   );
 };
@@ -166,6 +186,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
   },
+  logoutButton: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 100,
+  }
 });
 
 export default Home;

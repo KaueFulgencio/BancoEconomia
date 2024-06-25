@@ -7,6 +7,7 @@ import { RootStackParamList } from '../../navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '../../components/Container';
 import { strings } from 'components/strings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SendPixScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SendPixScreen'>;
 type SendPixScreenRouteProp = RouteProp<RootStackParamList, 'SendPixScreen'>;
@@ -37,9 +38,22 @@ const SendPixScreen: React.FC<Props> = ({ navigation, route }) => {
   const handleSendPix = async () => {
     try {
       setLoading(true);
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        setLoading(false);
+        return;
+      }
+  
       const requestBody = { fromEmail, toEmail, amount: parseFloat(amount) };
-
-      const response = await axios.post(`${BASE_URL}/accounts/send-pix`, requestBody);
+  
+      const response = await axios.post(`${BASE_URL}/accounts/send-pix`, requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       
       setLoading(false);
       Alert.alert('Sucesso', 'PIX enviado com sucesso!');
@@ -55,6 +69,7 @@ const SendPixScreen: React.FC<Props> = ({ navigation, route }) => {
       }
     }
   };
+  
 
   return (
     <Container>

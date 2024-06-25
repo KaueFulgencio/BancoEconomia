@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import { strings } from 'components/strings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type UpdateAccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'UpdateAccountScreen'>;
 
@@ -48,19 +49,43 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<UpdateAccountDetails>(`${BASE_URL}/accounts/email/${email}`);
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        setLoading(false);
+        return;
+      }
+  
+      const response = await axios.get<UpdateAccountDetails>(`${BASE_URL}/accounts/email/${email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
       setAccountDetails(response.data);
       setLoading(false);
     } catch (err) {
       console.error('Failed to fetch account details:', err);
-      setError(strings.accountDetailsError);  
+      setError(strings.accountDetailsError);
       setLoading(false);
     }
   };
+  
 
   const handleUpdateAccount = async () => {
     try {
       setUpdating(true);
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        setUpdating(false);
+        return;
+      }
+  
       const response = await axios.patch<UpdateAccountDetails>(
         `${BASE_URL}/accounts/${email}`,
         {
@@ -70,17 +95,24 @@ export default function UpdateAccountScreen({ route }: { route: { params: Update
           ocupacao: accountDetails.ocupacao,
           endereco: accountDetails.endereco,
           urlFotoAccount: accountDetails.urlFotoAccount,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
+  
       setAccountDetails(response.data);
       setUpdating(false);
       navigation.navigate('AccountScreen', { email: response.data.email });
     } catch (err) {
       console.error('Failed to update account details:', err);
       setUpdating(false);
-      Alert.alert(strings.error, strings.accountUpdateFailed); 
+      Alert.alert(strings.error, strings.accountUpdateFailed);
     }
   };
+  
 
   const handleChange = (key: keyof UpdateAccountDetails, value: string) => {
     setAccountDetails(prevState => ({

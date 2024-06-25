@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from '../components/Container';
 import { strings } from 'components/strings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AccountScreen'>;
 
@@ -43,7 +44,20 @@ export default function AccountScreen() {
   const fetchAccountDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/email/${email}`);
+  
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        return;
+      }
+  
+      const response = await axios.get<AccountDetails>(`${BASE_URL}/accounts/email/${email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
       setAccountDetails(response.data);
       setLoading(false);
     } catch (err) {
@@ -52,6 +66,7 @@ export default function AccountScreen() {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchAccountDetails();
@@ -73,7 +88,19 @@ export default function AccountScreen() {
 
   const confirmDeleteAccount = async () => {
     try {
-      await axios.delete(`${BASE_URL}/auth/delete-account/${email}`);
+      const token = await AsyncStorage.getItem('token');
+  
+      if (!token) {
+        console.error('Token não encontrado no AsyncStorage');
+        return;
+      }
+  
+      await axios.delete(`${BASE_URL}/auth/delete-account/${email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
       setShowDeleteModal(false);
       navigation.navigate('Login');
     } catch (error) {
@@ -82,6 +109,7 @@ export default function AccountScreen() {
       setError('Falha ao deletar conta. Por favor, tente novamente.');
     }
   };
+  
 
   return (
     <Container>
